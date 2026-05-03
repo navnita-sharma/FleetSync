@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar" />
+    <!-- Use the name that matches your AndroidManifest.xml -->
+    <style name="Theme.FleetSync" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Optional: Add primary colors here if needed -->
+    </style>
+
+</resources>

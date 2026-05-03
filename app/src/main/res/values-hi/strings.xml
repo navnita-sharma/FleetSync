@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">FleetSync</string>
+    
+    <string name="orders_title">आदेश</string>
+    <string name="tab_all">सभी</string>
+    <string name="tab_in_transit">रास्ते में</string>
+    <string name="tab_pending">लंबित</string>
+    <string name="tab_delivered">वितरित</string>
+    <string name="no_orders">अभी कोई आदेश नहीं है</string>
+    
+    <string name="create_order">आदेश बनाएँ</string>
+    <string name="edit_order">आदेश संपादित करें</string>
+    <string name="save_changes">बदलाव सहेजें</string>
+    <string name="delete_order">आदेश हटाएं</string>
+    <string name="delete_confirm">क्या आप वाकई इस आदेश को हटाना चाहते हैं?</string>
+    <string name="confirm">पुष्टि करें</string>
+    <string name="cancel">रद्द करें</string>
+    
+    <string name="driver">ड्राइवर</string>
+    <string name="vehicle">वाहन</string>
+    <string name="source">स्रोत</string>
+    <string name="destination">गंतव्य</string>
+    <string name="select_driver">ड्राइवर चुनें</string>
+    <string name="select_vehicle">वाहन चुनें</string>
+    
+    <string name="order_updated">आदेश अपडेट किया गया!</string>
+    <string name="trip_accepted">यात्रा स्वीकार की गई ✅</string>
+    <string name="order_delivered">आदेश वितरित 🎉</string>
+    <string name="new_order_assigned">नया आदेश सौंपा गया</string>
+    
+    <string name="view_map">नक्शा देखें</string>
+    <string name="start_trip">यात्रा शुरू करें</string>
+    <string name="mark_delivered">वितरित चिह्नित करें</string>
+    
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="language_switcher">भाषा</string>
+    <string name="english">अंग्रेजी</string>
+    <string name="hindi">हिंदी</string>
+</resources>
