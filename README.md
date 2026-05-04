@@ -124,6 +124,8 @@ classDiagram
 
 ### 6. Shipment Lifecycle (Timeline)
 ```mermaid
+<img width="1204" height="431" alt="image" src="https://github.com/user-attachments/assets/6722eb16-744c-4478-9eb9-095a2acd198e" />
+
 timeline
     title Shipment Lifecycle
     Order Created : Shipment ID & Passkey Generated
