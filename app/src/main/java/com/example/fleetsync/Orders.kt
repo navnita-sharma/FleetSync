@@ -33,6 +33,9 @@ import android.widget.Toast
 
 data class Order(
     val id: String = "",
+    val shipmentId: String = "",
+    val trackingPasskey: String = "",
+    val assignedVehicleId: String = "",
     val vehicle: String = "",
     val driver: String = "",
     val from: String = "",
@@ -281,7 +284,26 @@ fun OrdersScreen(
                                 isDarkMode = isDarkMode,
                                 onEdit     = { tripToEdit   = trip },
                                 onDelete   = { tripToDelete = trip },
-                                onTrack    = { onTrackClick(trip.tripId) }
+                                onTrack    = { onTrackClick(trip.tripId) },
+                                onShare    = {
+                                    fleetViewModel.regenerateTrackingCredentials(
+                                        tripId = trip.tripId,
+                                        onSuccess = { newId, newPasskey ->
+                                            val shareIntent = android.content.Intent().apply {
+                                                action = android.content.Intent.ACTION_SEND
+                                                putExtra(android.content.Intent.EXTRA_TEXT, 
+                                                    "Track your shipment live!\n" +
+                                                    "Shipment ID: $newId\n" +
+                                                    "Passkey: $newPasskey\n" +
+                                                    "Driver: ${trip.assignedDriverName}\n" +
+                                                    "Contact: ${trip.assignedDriverPhone}")
+                                                type = "text/plain"
+                                            }
+                                            context.startActivity(android.content.Intent.createChooser(shareIntent, "Share Tracking Details"))
+                                        },
+                                        onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                                    )
+                                }
                             )
                         }
                         item { Spacer(Modifier.height(8.dp)) }
@@ -300,7 +322,8 @@ fun LiveTripCard(
     isDarkMode: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onTrack: () -> Unit
+    onTrack: () -> Unit,
+    onShare: () -> Unit
 ) {
     val statusColor = when (trip.status) {
         "In Transit" -> Color(0xFFE68A1E)
@@ -380,16 +403,31 @@ fun LiveTripCard(
             
             if (trip.status != "Pending") {
                 Spacer(Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = onTrack,
-                    modifier = Modifier.fillMaxWidth().height(36.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(0.dp),
-                    border = BorderStroke(1.dp, statusColor.copy(alpha = 0.5f))
-                ) {
-                    Icon(Icons.Default.Route, null, tint = statusColor, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Track Status", fontSize = 12.sp, color = statusColor, fontWeight = FontWeight.Bold)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = onTrack,
+                        modifier = Modifier.weight(1f).height(36.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        border = BorderStroke(1.dp, statusColor.copy(alpha = 0.5f))
+                    ) {
+                        Icon(Icons.Default.Route, null, tint = statusColor, modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Track Status", fontSize = 12.sp, color = statusColor, fontWeight = FontWeight.Bold)
+                    }
+
+                    val context = LocalContext.current
+                    OutlinedButton(
+                        onClick = onShare,
+                        modifier = Modifier.weight(1f).height(36.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.5f))
+                    ) {
+                        Icon(Icons.Default.Share, null, tint = Color(0xFF6366F1), modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Share Link", fontSize = 12.sp, color = Color(0xFF6366F1), fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

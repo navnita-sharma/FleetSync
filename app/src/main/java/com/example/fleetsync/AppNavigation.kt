@@ -113,18 +113,8 @@ fun AppNavigation(authViewModel: AuthViewModel = viewModel()) {
 
             composable(route = "guest_tracking_login") {
                 CustomerTrackLoginScreen(
-                    onTrackClick = { shipmentId, passcode ->
-                        FirebaseFirestore.getInstance().collection("trips")
-                            .whereEqualTo("tripId", shipmentId)
-                            .whereEqualTo("trackingPasskey", passcode)
-                            .get()
-                            .addOnSuccessListener { snap ->
-                                if (!snap.isEmpty) {
-                                    navController.navigate(Screen.TrackOrder.createRoute(shipmentId))
-                                } else {
-                                    Toast.makeText(context, "Invalid ID or Passcode", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                    onTrackClick = { shipmentId ->
+                        navController.navigate(Screen.ClientMapTracking.createRoute(shipmentId))
                     },
                     onBackClick = { navController.popBackStack() }
                 )
@@ -218,13 +208,40 @@ fun AppNavigation(authViewModel: AuthViewModel = viewModel()) {
             }
 
             composable(route = Screen.TrackOrder.route) {
-                val fleetViewModel: FleetDashboardViewModel = viewModel()
+                val customerVM: CustomerTrackingViewModel = viewModel()
                 val tripId = it.arguments?.getString("tripId") ?: ""
-                val trip = fleetViewModel.liveTrips.find { t -> t.tripId == tripId } ?: TripModel()
+                
+                LaunchedEffect(tripId) {
+                    customerVM.observeTrip(tripId)
+                }
 
-                TrackOrderScreen(
-                    trip = trip,
-                    isDarkMode = isDarkMode,
+                val trip = customerVM.currentTrip
+                val isInvalid = customerVM.isTripInvalid
+
+                if (isInvalid) {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Tracking session expired or invalid", Toast.LENGTH_LONG).show()
+                        navController.popBackStack("guest_tracking_login", inclusive = false)
+                    }
+                }
+
+                if (trip != null) {
+                    TrackOrderScreen(
+                        trip = trip,
+                        isDarkMode = isDarkMode,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                } else if (!isInvalid) {
+                    Box(modifier = androidx.compose.ui.Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                        CircularProgressIndicator(color = Color(0xFFE68A1E))
+                    }
+                }
+            }
+
+            composable(route = Screen.ClientMapTracking.route) {
+                val tripId = it.arguments?.getString("tripId") ?: ""
+                ClientMapTrackingScreen(
+                    tripId = tripId,
                     onBackClick = { navController.popBackStack() }
                 )
             }

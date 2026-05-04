@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Trips Collection Rules
+    match /trips/{tripId} {
+      // 1. Authenticated users (Fleet Owners/Drivers) can read and write
+      allow read, write: if request.auth != null;
+
+      // 2. Secure Tracking for Clients (No Auth Required)
+      // Read is allowed if:
+      // - The document exists
+      // - The passkey is not empty (invalidated upon delivery)
+      // - The trip status is NOT "Delivered"
+      allow read: if resource.data.trackingPasskey != ""
+                  && resource.data.status != "Delivered";
+    }
+
+    // Other collections (standard auth)
+    match /{path=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

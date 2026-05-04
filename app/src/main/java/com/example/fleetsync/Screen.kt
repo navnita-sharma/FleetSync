@@ -14,4 +14,7 @@ sealed class Screen(val route: String) {
     object TrackOrder : Screen("track_order/{tripId}") {
         fun createRoute(tripId: String) = "track_order/$tripId"
     }
+    object ClientMapTracking : Screen("client_map_tracking/{tripId}") {
+        fun createRoute(tripId: String) = "client_map_tracking/$tripId"
+    }
 }

@@ -6,6 +6,7 @@ data class TripModel(
     val destination        : String = "",
     val assignedDriverUid  : String = "",
     val assignedDriverName : String = "",
+    val assignedDriverPhone: String = "",
     val vehicleNumber      : String = "",
     val companyId          : String = "",
     val status             : String = "Pending",   // "Pending" | "In Transit" | "Delivered"
@@ -25,7 +26,13 @@ data class TripModel(
     // ─── Secure tracking link ─────────────────────────────────────────────────
     val trackingPasskey    : String = "",
     val trackingLink       : String = "",
-    val expiresAt          : Long   = 0L   // Unix ms; 0 = never set
+    val shipmentId         : String = "", // Dynamic UUID ID
+    val expiresAt          : Long   = 0L,   // Unix ms; 0 = never set
+    
+    // ─── Real-time coordinates ────────────────────────────────────────────────
+    val latitude           : Double = 0.0,
+    val longitude          : Double = 0.0,
+    val lastUpdated        : Long   = 0L
 )
 
 data class TollEvent(

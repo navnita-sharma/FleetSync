@@ -21,11 +21,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fleetsync.ui.theme.FleetSyncTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun CustomerTrackLoginScreen(onTrackClick: (String, String) -> Unit, onBackClick: () -> Unit = {}) {
+fun CustomerTrackLoginScreen(
+    onTrackClick: (String) -> Unit, 
+    onBackClick: () -> Unit = {},
+    viewModel: CustomerTrackingViewModel = viewModel()
+) {
     var shipmentId by remember { mutableStateOf("") }
     var passcode by remember { mutableStateOf("") }
+    
+    val verificationError = viewModel.verificationError
 
     val cardBg = Color.White
     val accentBlue = Color(0xFF1A1F71)
@@ -53,8 +60,8 @@ fun CustomerTrackLoginScreen(onTrackClick: (String, String) -> Unit, onBackClick
             ) {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        Icons.Default.Lock,
-                        contentDescription = null,
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
                         tint = accentBlue,
                         modifier = Modifier.size(24.dp)
                     )
@@ -140,7 +147,7 @@ fun CustomerTrackLoginScreen(onTrackClick: (String, String) -> Unit, onBackClick
                     TrackingTextField(
                         value = shipmentId,
                         onValueChange = { shipmentId = it },
-                        placeholder = "e.g., FS-99120"
+                        placeholder = "e.g., 550e8400-e29b-41d4-a716..."
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -155,37 +162,58 @@ fun CustomerTrackLoginScreen(onTrackClick: (String, String) -> Unit, onBackClick
                     Spacer(modifier = Modifier.height(8.dp))
                     TrackingTextField(
                         value = passcode,
-                        onValueChange = { passcode = it },
+                        onValueChange = { if (it.length <= 6) passcode = it },
                         placeholder = ". . . . . ."
                     )
+                    
+                    if (verificationError != null) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = verificationError,
+                            color = Color.Red,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Track Button
                     Button(
-                        onClick = { onTrackClick(shipmentId, passcode) },
+                        onClick = { 
+                            if (shipmentId.isNotBlank() && passcode.length == 6) {
+                                viewModel.verifyShipment(shipmentId, passcode) {
+                                    onTrackClick(it)
+                                }
+                            }
+                        },
+                        enabled = !viewModel.isVerifying,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                "Track Shipment",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
+                        if (viewModel.isVerifying) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    "Track Now",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
                         }
                     }
 
@@ -296,6 +324,6 @@ fun TrackingTextField(
 @Composable
 fun CustomerTrackLoginScreenPreview() {
     FleetSyncTheme {
-        CustomerTrackLoginScreen(onTrackClick = { _, _ -> })
+        CustomerTrackLoginScreen(onTrackClick = { _ -> })
     }
 }

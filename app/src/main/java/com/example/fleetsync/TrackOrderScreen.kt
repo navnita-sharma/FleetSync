@@ -69,30 +69,71 @@ fun TrackOrderScreen(
             // Toll Progress Card
             Row(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 InfoCard(Modifier.weight(1f), "Tolls Crossed", "${trip.passedTolls}/${trip.totalTolls}", Color(0xFF6366F1), cardBg, isDarkMode)
                 InfoCard(Modifier.weight(1f), "ETA", trip.eta.ifBlank { "Calculating..." }, Color(0xFF10B981), cardBg, isDarkMode)
+                InfoCard(Modifier.weight(1.1f), "Distance", trip.distanceKm.toString(), Color(0xFFE68A1E), cardBg, isDarkMode, unit = "km")
             }
 
             // Header Card
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 colors = CardDefaults.cardColors(containerColor = cardBg),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier.size(48.dp).background(accentOrange.copy(alpha = 0.1f), CircleShape),
+                        modifier = Modifier.size(52.dp).background(accentOrange.copy(alpha = 0.1f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.LocalShipping, null, tint = accentOrange, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.LocalShipping, null, tint = accentOrange, modifier = Modifier.size(26.dp))
                     }
                     Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text(trip.vehicleNumber, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = textColor)
-                        Text(trip.status, fontSize = 13.sp, color = accentOrange, fontWeight = FontWeight.Bold)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(trip.vehicleNumber, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = textColor)
+                        Text(trip.status, fontSize = 14.sp, color = accentOrange, fontWeight = FontWeight.Bold)
+                    }
+                    
+                    // Driver Info (on the right)
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(trip.assignedDriverName, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = textColor)
+                        if (trip.assignedDriverPhone.isNotBlank()) {
+                            Text(trip.assignedDriverPhone, fontSize = 13.sp, color = Color.Gray)
+                        }
+                    }
+                }
+            }
+
+            // Live Location / Map Placeholder
+            if (trip.status == "In Transit") {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                    colors = CardDefaults.cardColors(containerColor = cardBg),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Place, null, tint = Color.Red, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("LIVE LOCATION", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            "Coordinates: ${trip.latitude}, ${trip.longitude}",
+                            fontSize = 14.sp,
+                            color = textColor,
+                            fontWeight = FontWeight.Medium
+                        )
+                        if (trip.lastUpdated > 0) {
+                            Text(
+                                "Last updated: ${SimpleDateFormat("hh:mm:ss a", Locale.getDefault()).format(Date(trip.lastUpdated))}",
+                                fontSize = 11.sp,
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }
@@ -114,16 +155,31 @@ fun TrackOrderScreen(
 }
 
 @Composable
-fun InfoCard(modifier: Modifier, label: String, value: String, color: Color, cardBg: Color, isDarkMode: Boolean) {
+fun InfoCard(
+    modifier: Modifier, 
+    label: String, 
+    value: String, 
+    color: Color, 
+    cardBg: Color, 
+    isDarkMode: Boolean,
+    unit: String = ""
+) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = color)
-            Text(label, fontSize = 10.sp, color = if (isDarkMode) Color.Gray else Color.DarkGray, fontWeight = FontWeight.Bold)
+        Column(
+            modifier = Modifier.padding(12.dp), 
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(value, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = color)
+            if (unit.isNotBlank()) {
+                Text(unit, fontSize = 12.sp, color = color, fontWeight = FontWeight.Bold)
+            }
+            Text(label, fontSize = 11.sp, color = if (isDarkMode) Color.Gray else Color.DarkGray, fontWeight = FontWeight.Bold)
         }
     }
 }
