@@ -122,20 +122,6 @@ classDiagram
 ```
 **Explanation**: The application logic is modularized into specialized ViewModels. `AuthViewModel` handles identity, `FleetDashboardViewModel` manages the owner's perspective, and `CustomerTrackingViewModel` provides a lightweight, secure bridge for guest clients to monitor their specific `TripModel`.
 
-### 6. Shipment Lifecycle (Timeline)
-```mermaid
-<img width="1204" height="431" alt="image" src="https://github.com/user-attachments/assets/6722eb16-744c-4478-9eb9-095a2acd198e" />
-
-timeline
-    title Shipment Lifecycle
-    Order Created : Shipment ID & Passkey Generated
-    Vehicle Assigned : Driver details linked
-    Dispatched : Live tracking active : Link shared with Client
-    En Route : Toll crossings : Route monitoring
-    Delivered : Destination reached : Passkey invalidated
-```
-**Explanation**: This chart maps the journey of a shipment. A crucial security feature is the automatic **invalidation of the passkey** once a shipment is marked as "Delivered," protecting sensitive logistics data.
-
 ## ⚙️ Detailed Functionalities
 
 ### 1. Fleet Owner Dashboard
